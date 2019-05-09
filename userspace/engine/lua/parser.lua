@@ -28,12 +28,6 @@
 
 local parser = {}
 
-parser.verbose = false
-
-function parser.set_verbose(verbose)
-   parser.verbose = verbose
-end
-
 local lpeg = require "lpeg"
 
 lpeg.locale(lpeg)
@@ -265,7 +259,8 @@ local G = {
           symb("contains") / "contains" +
           symb("icontains") / "icontains" +
           symb("glob") / "glob" +
-          symb("startswith") / "startswith";
+          symb("startswith") / "startswith" +
+          symb("endswith") / "endswith";
   InOp = kw("in") / "in";
   PmatchOp = kw("pmatch") / "pmatch";
   UnaryBoolOp = kw("not") / "not";

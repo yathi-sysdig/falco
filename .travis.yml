@@ -15,7 +15,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-language: c
+language: cpp
+compiler: gcc
 env:
     - BUILD_TYPE=Debug
     - BUILD_TYPE=Release
@@ -23,37 +24,19 @@ sudo: required
 services:
     - docker
 before_install:
-    - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
     - sudo apt-get update
 install:
-    - sudo apt-get --force-yes install g++-4.8
+    - export BRANCH=$(if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then echo $TRAVIS_BRANCH; else echo $TRAVIS_PULL_REQUEST_BRANCH; fi)
     - sudo apt-get install rpm linux-headers-$(uname -r) libelf-dev
     - git clone https://github.com/draios/sysdig.git ../sysdig
-    - sudo apt-get install -y python-pip libvirt-dev jq dkms
-    - cd ..
-    - curl -Lo avocado-36.0-tar.gz https://github.com/avocado-framework/avocado/archive/36.0lts.tar.gz
-    - tar -zxvf avocado-36.0-tar.gz
-    - cd avocado-36.0lts
-    - sed -e 's/libvirt-python>=1.2.9/libvirt-python>=1.2.9,<4.1.0/' < requirements.txt  > /tmp/requirements.txt && mv /tmp/requirements.txt ./requirements.txt
-    - sudo -H pip install -r requirements.txt
-    - sudo python setup.py install
-    - cd ../falco
-before_script:
-    - export KERNELDIR=/lib/modules/$(uname -r)/build
+    # if available, use the branch with the same name in sysdig
+    - pushd ../sysdig && (git checkout "${BRANCH}" || exit 0) && echo "Using sysdig branch:" $(git rev-parse --abbrev-ref HEAD) && popd
 script:
-    - set -e
-    - export CC="gcc-4.8"
-    - export CXX="g++-4.8"
     - mkdir build
     - cd build
-    - cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DDRAIOS_DEBUG_FLAGS="-D_DEBUG -DNDEBUG"
-    - make VERBOSE=1
-    - make package
-    - cp falco*.deb ../docker/local
-    - cd ../docker/local
-    - docker build -t sysdig/falco:test .
-    - cd ../..
-    - sudo test/run_regression_tests.sh $TRAVIS_BRANCH
+    - docker run --user $(id -u):$(id -g) -v /etc/passwd:/etc/passwd:ro -e MAKE_JOBS=4 -v $TRAVIS_BUILD_DIR/..:/source -v $TRAVIS_BUILD_DIR/build:/build falcosecurity/falco-builder cmake
+    - docker run --user $(id -u):$(id -g) -v /etc/passwd:/etc/passwd:ro -e MAKE_JOBS=4 -v $TRAVIS_BUILD_DIR/..:/source -v $TRAVIS_BUILD_DIR/build:/build falcosecurity/falco-builder package
+    - docker run -v /boot:/boot:ro -v /var/run/docker.sock:/var/run/docker.sock -v /etc/passwd:/etc/passwd:ro -e MAKE_JOBS=4 -v $TRAVIS_BUILD_DIR/..:/source -v $TRAVIS_BUILD_DIR/build:/build falcosecurity/falco-tester
 notifications:
   webhooks:
     urls:
