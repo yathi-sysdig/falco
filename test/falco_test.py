@@ -93,6 +93,15 @@ class FalcoTest(Test):
             if not isinstance(self.validate_rules_file, list):
                 self.validate_rules_file = [self.validate_rules_file]
 
+        self.psp_file = self.params.get('psp_file', '*', default=False)
+        self.k8s_psp_rules_template_file = self.params.get('k8s_psp_rules_template', '*', default=os.path.join(self.basedir, '../rules/templates/k8s_psp_rules.yaml.tmpl'))
+
+        if self.psp_file == False:
+            self.psp_file = []
+        else:
+            if not isinstance(self.psp_file, list):
+                self.psp_file = [self.psp_file]
+
         self.rules_args = ""
 
         for file in self.validate_rules_file:
@@ -104,6 +113,14 @@ class FalcoTest(Test):
             if not os.path.isabs(file):
                 file = os.path.join(self.basedir, file)
             self.rules_args = self.rules_args + "-r " + file + " "
+
+        for file in self.psp_file:
+            if not os.path.isabs(file):
+                file = os.path.join(self.basedir, file)
+            self.rules_args = self.rules_args + "--psp " + file + " "
+
+        if self.psp_file:
+            self.rules_args = self.rules_args + "-o k8s_psp_rules_template=" + self.k8s_psp_rules_template_file + " "
 
         self.conf_file = self.params.get('conf_file', '*', default=os.path.join(self.basedir, '../falco.yaml'))
         if not os.path.isabs(self.conf_file):
