@@ -38,6 +38,7 @@ limitations under the License.
 #include "rules.h"
 #include "ruleset.h"
 
+#include "k8s_psp.h"
 #include "config_falco_engine.h"
 #include "falco_common.h"
 
@@ -75,6 +76,12 @@ public:
 	void load_rules_file(const std::string &rules_filename, bool verbose, bool all_events, uint64_t &required_engine_version);
 	void load_rules(const std::string &rules_content, bool verbose, bool all_events, uint64_t &required_engine_version);
 
+	// Parse a YAML document containing a pod security policy
+	// (PSP) and return falco rules content that detects PSP
+	// violations. This rules content can then be loaded into the
+	// engine using load_rules().
+	//
+	std::string k8s_psp_to_falco_rules(const std::string &psp_yaml, const std::string &rules_template);
 	//
 	// Enable/Disable any rules matching the provided substring.
 	// If the substring is "", all rules are enabled/disabled.
@@ -287,5 +294,7 @@ private:
 
 	std::string m_extra;
 	bool m_replace_container_info;
+
+	falco::k8s_psp_converter m_psp_converter;
 };
 

@@ -34,6 +34,11 @@ rules_file:
  - /etc/falco/k8s_audit_rules.yaml
  - /etc/falco/rules.d
 
+# When using --psp to autogenerate a set of falco rules from a K8s Pod
+# Security Policy (psp), use this template file to autogenerate the
+# rules.
+k8s_psp_rules_template: /etc/falco/rules/templates/k8s_psp_rules.yaml.tmpl
+
 # If true, the times displayed in log messages and output messages
 # will be in ISO 8601. By default, times are displayed in the local
 # time zone, as governed by /etc/localtime.

@@ -79,6 +79,8 @@ void falco_configuration::init(string conf_filename, list<string> &cmdline_optio
 		}
 	}
 
+	m_psp_rules_template = m_config->get_scalar<std::string>(string("k8s_psp_rules_template"), "k8s_psp_rules.yaml.tmpl");
+
 	m_json_output = m_config->get_scalar<bool>("json_output", false);
 	m_json_include_output_property = m_config->get_scalar<bool>("json_include_output_property", true);
 

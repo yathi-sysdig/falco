@@ -99,6 +99,11 @@ static void usage()
 	   "                               Can not be specified with -t.\n"
 	   " -e <events_file>              Read the events from <events_file> (in .scap format for sinsp events, or jsonl for\n"
 	   "                               k8s audit events) instead of tapping into live.\n"
+	   " --psp <psp yaml file>         Read the provided file containing a K8s Pod Security Policy (PSP) specification,\n"
+	   "                               generate a rules file that can be used to detect potential violations of the PSP,\n"
+	   "                               and load the rules.\n"
+	   " --psp_save [<path>]           With --psp, save the resulting rules file to the provided path. If no <path> is\n"
+	   "                               provided, a .rules suffix is added to the psp yaml path and used as the path\n"
 	   " -k <url>, --k8s-api <url>\n"
 	   "                               Enable Kubernetes support by connecting to the API server specified as argument.\n"
        "                               E.g. \"http://admin:password@127.0.0.1:8080\".\n"
@@ -429,6 +434,9 @@ int falco_init(int argc, char **argv)
 	string list_flds_source = "";
 	bool print_support = false;
 	string cri_socket_path;
+	string psp_path;
+	string psp_rules_path;
+	bool psp_save_rules = false;
 	set<string> disable_sources;
 	bool disable_syscall = false;
 	bool disable_k8s_audit = false;
@@ -462,6 +470,8 @@ int falco_init(int argc, char **argv)
         {"mesos-api", required_argument, 0, 'm'},
         {"option", required_argument, 0, 'o'},
         {"pidfile", required_argument, 0, 'P'},
+	{"psp", required_argument, 0},
+	{"psp_save", optional_argument, 0},
         {"print-base64", no_argument, 0, 'b'},
         {"print", required_argument, 0, 'p'},
         {"snaplen", required_argument, 0, 'S'},
@@ -625,6 +635,18 @@ int falco_init(int argc, char **argv)
 					if(optarg != NULL)
 					{
 						list_flds_source = optarg;
+					}
+				}
+				else if (string(long_options[long_index].name) == "psp")
+				{
+					psp_path = optarg;
+				}
+				else if (string(long_options[long_index].name) == "psp_save")
+				{
+					psp_save_rules = true;
+					if(optarg != NULL)
+					{
+						psp_rules_path = optarg;
 					}
 				}
 				else if (string(long_options[long_index].name) == "stats_interval")
@@ -794,7 +816,7 @@ int falco_init(int argc, char **argv)
 			config.m_buffered_outputs = buffered_outputs;
 		}
 
-		if(config.m_rules_filenames.size() == 0)
+		if(config.m_rules_filenames.size() == 0 && psp_path == "")
 		{
 			throw std::invalid_argument("You must specify at least one rules file/directory via -r or a rules_file entry in falco.yaml");
 		}
@@ -812,6 +834,38 @@ int falco_init(int argc, char **argv)
 
 			engine->load_rules_file(filename, verbose, all_events, required_engine_version);
 			required_engine_versions[filename] = required_engine_version;
+		}
+
+		if(psp_path != "")
+		{
+			falco_logger::log(LOG_INFO, "Loading K8s PSP from file " + psp_path + ", generating rules, and loading rules:\n");
+			std::string psp_yaml;
+			std::string psp_rules;
+			std::string rules_template;
+			uint64_t required_engine_version;
+
+			psp_yaml = read_file(psp_path);
+			rules_template = read_file(config.m_psp_rules_template);
+
+			psp_rules = engine->k8s_psp_to_falco_rules(psp_yaml, rules_template);
+
+			falco_logger::log(LOG_DEBUG, "Rules from template: " + psp_rules);
+
+			if(psp_save_rules)
+			{
+				if(psp_rules_path.empty())
+				{
+					psp_rules_path = psp_path + ".rules";
+				}
+				falco_logger::log(LOG_INFO, "Saving resulting rules to " + psp_rules_path + "\n");
+
+				std::ofstream out(psp_rules_path);
+				out << psp_rules;
+			}
+
+			engine->load_rules(psp_rules, verbose, all_events, required_engine_version);
+
+			// XXX/mstemm not sure if this should be added to the support bundle
 		}
 
 		// You can't both disable and enable rules

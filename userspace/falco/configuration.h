@@ -196,6 +196,9 @@ class falco_configuration
 	static void read_rules_file_directory(const string &path, list<string> &rules_filenames);
 
 	std::list<std::string> m_rules_filenames;
+
+	std::string m_psp_rules_template;
+
 	bool m_json_output;
 	bool m_json_include_output_property;
 	std::vector<falco_outputs::output_config> m_outputs;

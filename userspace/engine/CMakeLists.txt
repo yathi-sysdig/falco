@@ -24,6 +24,7 @@ set(FALCO_ENGINE_SOURCE_FILES
 	falco_common.cpp
 	falco_engine.cpp
 	json_evt.cpp
+	k8s_psp.cpp
 	ruleset.cpp
 	token_bucket.cpp
 	formats.cpp)
@@ -31,8 +32,10 @@ set(FALCO_ENGINE_SOURCE_FILES
 add_library(falco_engine STATIC ${FALCO_ENGINE_SOURCE_FILES})
 
 target_include_directories(falco_engine PUBLIC
+	"${INJA_INCLUDE}"
 	"${LUAJIT_INCLUDE}"
 	"${NJSON_INCLUDE}"
+	"${YAMLCPP_INCLUDE_DIR}"
 	"${CURL_INCLUDE_DIR}"
 	"${TBB_INCLUDE_DIR}"
 	"${SYSDIG_DIR}/userspace/libsinsp/third-party/jsoncpp"
