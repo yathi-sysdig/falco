@@ -71,7 +71,8 @@ target_link_libraries(falco
 	"${PROTOBUF_LIB}"
 	"${LIBYAML_LIB}"
 	"${YAMLCPP_LIB}"
-	"${CIVETWEB_LIB}")
+	"${CIVETWEB_LIB}"
+	"${CIVETWEBCPP_LIB}")
 
 configure_file(config_falco.h.in config_falco.h)
 

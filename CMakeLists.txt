@@ -509,22 +509,32 @@ if(NOT USE_BUNDLED_CIVETWEB)
 	endif()
 else()
 	set(CIVETWEB_SRC "${PROJECT_BINARY_DIR}/civetweb-prefix/src/civetweb/")
-	set(CIVETWEB_LIB "${CIVETWEB_SRC}/install/lib/libcivetweb.a")
-	set(CIVETWEB_INCLUDE_DIR "${CIVETWEB_SRC}/install/include")
+	set(CIVETWEB_LIB "${PROJECT_BINARY_DIR}/civetweb-prefix/build/src/libcivetweb.a")
+	set(CIVETWEBCPP_LIB "${PROJECT_BINARY_DIR}/civetweb-prefix/build/src/libcivetweb-cpp.a")
+	set(CIVETWEB_INCLUDE_DIR "${CIVETWEB_SRC}/include")
 	message(STATUS "Using bundled civetweb in '${CIVETWEB_SRC}'")
 	set(CIVETWEB_DEPENDENCIES "")
-	if(USE_BUNDLED_OPENSSL)
-	 	list(APPEND CIVETWEB_DEPENDENCIES "openssl")
+	if(USE_BUNDLED_OPENSSL) # TODO(fntlnz,leodido): this should disable ssl dynamic linking after
+		 list(APPEND CIVETWEB_DEPENDENCIES "openssl")
 	endif()
-	ExternalProject_Add(civetweb
-		DEPENDS ${CIVETWEB_DEPENDENCIES}
-		URL "https://s3.amazonaws.com/download.draios.com/dependencies/civetweb-1.11.tar.gz"
-                URL_MD5 "b6d2175650a27924bccb747cbe084cd4"
-		CONFIGURE_COMMAND ${CMAKE_COMMAND} -E make_directory ${CIVETWEB_SRC}/install/lib
-		          COMMAND ${CMAKE_COMMAND} -E make_directory ${CIVETWEB_SRC}/install/include
-                BUILD_IN_SOURCE 1
-                BUILD_COMMAND ${CMD_MAKE} COPT="-DNO_FILES" WITH_CPP=1
-		INSTALL_COMMAND ${CMD_MAKE} install-lib install-headers PREFIX=${CIVETWEB_SRC}/install WITH_CPP=1)
+
+	ExternalProject_Add(
+		civetweb
+		URL "https://github.com/civetweb/civetweb/archive/v1.11.tar.gz"
+		URL_MD5 "b6d2175650a27924bccb747cbe084cd4"
+		CONFIGURE_COMMAND
+			"${CMAKE_COMMAND}"
+			"-H${PROJECT_BINARY_DIR}/civetweb-prefix/src/civetweb/"
+			"-B${PROJECT_BINARY_DIR}/civetweb-prefix/build"
+			"-DCIVETWEB_ENABLE_SSL=On"
+			"-DCIVETWEB_ENABLE_SSL_DYNAMIC_LOADING=Off"
+			"-DCIVETWEB_ENABLE_CXX=On"
+			"-DCIVETWEB_SERVE_NO_FILES=On"
+		BUILD_COMMAND "${CMAKE_COMMAND}" --build "${PROJECT_BINARY_DIR}/civetweb-prefix/build" --target civetweb-c-library --target civetweb-cpp
+		INSTALL_COMMAND ""
+	)
+	
+
 endif()
 
 option(USE_BUNDLED_CARES "Enable building of the bundled c-ares" ${USE_BUNDLED_DEPS})
