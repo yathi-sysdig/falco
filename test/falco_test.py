@@ -40,6 +40,8 @@ class FalcoTest(Test):
 
         self.falcodir = self.params.get('falcodir', '/', default=build_dir)
 
+        self.psp_conv_path = os.path.join(build_dir, "tools", "psp_conv", "psp_conv")
+
         self.stdout_is = self.params.get('stdout_is', '*', default='')
         self.stderr_is = self.params.get('stderr_is', '*', default='')
 
@@ -93,16 +95,14 @@ class FalcoTest(Test):
             if not isinstance(self.validate_rules_file, list):
                 self.validate_rules_file = [self.validate_rules_file]
 
-        self.psp_file = self.params.get('psp_file', '*', default=False)
-        self.k8s_psp_rules_template_file = self.params.get('k8s_psp_rules_template', '*', default=os.path.join(self.basedir, '../rules/templates/k8s_psp_rules.yaml.tmpl'))
+        self.psp_rules_file = os.path.join(build_dir, "psp_rules.yaml")
 
-        if self.psp_file == False:
-            self.psp_file = []
-        else:
-            if not isinstance(self.psp_file, list):
-                self.psp_file = [self.psp_file]
+        self.psp_file = self.params.get('psp_file', '*', default="")
 
         self.rules_args = ""
+
+        if self.psp_file != "":
+            self.rules_args = self.rules_args + "-r " + self.psp_rules_file + " "
 
         for file in self.validate_rules_file:
             if not os.path.isabs(file):
@@ -113,14 +113,6 @@ class FalcoTest(Test):
             if not os.path.isabs(file):
                 file = os.path.join(self.basedir, file)
             self.rules_args = self.rules_args + "-r " + file + " "
-
-        for file in self.psp_file:
-            if not os.path.isabs(file):
-                file = os.path.join(self.basedir, file)
-            self.rules_args = self.rules_args + "--psp " + file + " "
-
-        if self.psp_file:
-            self.rules_args = self.rules_args + "-o k8s_psp_rules_template=" + self.k8s_psp_rules_template_file + " "
 
         self.conf_file = self.params.get('conf_file', '*', default=os.path.join(self.basedir, '../falco.yaml'))
         if not os.path.isabs(self.conf_file):
@@ -441,6 +433,24 @@ class FalcoTest(Test):
 
         if self.trace_file:
             trace_arg = "-e {}".format(self.trace_file)
+
+        # Possibly run psp converter
+        if self.psp_file != "":
+            conv_cmd = '{} --psp {} --rules {}'.format(
+                self.psp_conv_path, os.path.join(self.basedir, self.psp_file), self.psp_rules_file)
+
+            conv_proc = process.SubProcess(conv_cmd)
+
+            conv_res = conv_proc.run(timeout=180, sig=9)
+
+            if conv_res.exit_status != 0:
+                self.error("psp_conv command \"{}\" exited with unexpected return value {}. Full stdout={} stderr={}".format(
+                    conv_cmd, conv_res.exit_status, conv_res.stdout, conv_res.stderr))
+
+            with open(self.psp_rules_file, 'r') as myfile:
+                psp_rules = myfile.read()
+                self.log.debug("Converted Rules: {}".format(psp_rules))
+
 
         # Run falco
         cmd = '{} {} {} -c {} {} -o json_output={} -o json_include_output_property={} -o priority={} -v'.format(
