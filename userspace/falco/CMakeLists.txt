@@ -20,6 +20,7 @@ if(NOT SYSDIG_DIR)
 endif()
 
 configure_file("${SYSDIG_DIR}/userspace/sysdig/config_sysdig.h.in" config_sysdig.h)
+configure_file(config_falco.h.in config_falco.h)
 
 add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/output.grpc.pb.cc
 	${CMAKE_CURRENT_BINARY_DIR}/output.grpc.pb.h
@@ -62,8 +63,6 @@ target_include_directories(falco PUBLIC
 	"${CMAKE_CURRENT_BINARY_DIR}"
 	"${DRAIOS_DEPENDENCIES_DIR}/yaml-${DRAIOS_YAML_VERSION}/target/include")
 
-
-
 target_link_libraries(falco falco_engine sinsp)
 target_link_libraries(falco
 	"${GRPCPP_LIB}"
@@ -72,8 +71,6 @@ target_link_libraries(falco
 	"${LIBYAML_LIB}"
 	"${YAMLCPP_LIB}"
 	"${CIVETWEB_LIB}")
-
-configure_file(config_falco.h.in config_falco.h)
 
 add_custom_command(TARGET falco
 	COMMAND bash ${CMAKE_CURRENT_SOURCE_DIR}/verify_engine_fields.sh ${CMAKE_SOURCE_DIR}
