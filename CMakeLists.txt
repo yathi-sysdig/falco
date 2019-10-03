@@ -646,6 +646,7 @@ install(FILES falco.yaml
 add_subdirectory(test)
 add_subdirectory(rules)
 add_subdirectory(docker)
+add_subdirectory(tools)
 
 if(CMAKE_SYSTEM_NAME MATCHES "Linux")
 	add_subdirectory("${SYSDIG_DIR}/driver" "${PROJECT_BINARY_DIR}/driver")
