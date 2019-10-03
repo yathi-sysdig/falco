@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2016-2019 Draios Inc dba Sysdig.
+Copyright (C) 2016-2019 The Falco Authors
 
 This file is part of falco.
 
@@ -15,7 +15,6 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-
 #include "webserver.h"
 #include <catch.hpp>
 
@@ -24,7 +23,7 @@ TEST_CASE("webserver must accept invalid data", "[!hide][webserver][k8s_audit_ha
 	// falco_engine* engine = new falco_engine();
 	// falco_outputs* outputs = new falco_outputs(engine);
 	// std::string errstr;
-    // std::string input("{\"kind\": 0}");
+	// std::string input("{\"kind\": 0}");
 	//k8s_audit_handler::accept_data(engine, outputs, input, errstr);
 
 	REQUIRE(1 == 1);
