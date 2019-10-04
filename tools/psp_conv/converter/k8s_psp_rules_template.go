@@ -304,7 +304,7 @@ var (
   priority: WARNING
   source: k8s_audit
   tags: [k8s-psp]
-{{ end }}{{if .Spec.AllowPrivilegeEscalation}}{{ if not .Spec.AllowPrivilegeEscalation }}
+{{ end }}{{if not (AllowPrivilegeEscalation .Spec)}}
 #########################################
 # Rule(s) for PSP allowPrivilegeEscalation property
 #########################################
@@ -320,7 +320,7 @@ var (
   priority: WARNING
   source: k8s_audit
   tags: [k8s-psp]
-{{ end}}{{ end }}{{ if gt (len .Spec.AllowedCapabilities) 0 }}
+{{ end }}{{ if gt (len .Spec.AllowedCapabilities) 0 }}
 #########################################
 # Rule(s) for PSP allowedCapabilities property
 #########################################

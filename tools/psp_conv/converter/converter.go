@@ -127,6 +127,14 @@ func joinFlexvolumes(ranges []v1beta1.AllowedFlexVolume) string {
 	return sb.String()
 }
 
+func allowPrivilegeEscalation(spec v1beta1.PodSecurityPolicySpec) bool {
+	if spec.AllowPrivilegeEscalation != nil {
+		return *spec.AllowPrivilegeEscalation
+	}
+
+	return true
+}
+
 func NewConverter() (*Converter, error) {
 
 	tmpl := template.New("pspRules")
@@ -139,6 +147,7 @@ func NewConverter() (*Converter, error) {
 		"JoinHostPortRanges": joinHostPortRanges,
 		"JoinHostPaths": joinHostPaths,
 		"JoinFlexvolumes": joinFlexvolumes,
+		"AllowPrivilegeEscalation": allowPrivilegeEscalation,
 	})
 
 	tmpl, err := tmpl.Parse(K8sPspRulesTemplate)
