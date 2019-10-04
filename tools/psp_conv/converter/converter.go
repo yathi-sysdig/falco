@@ -24,7 +24,7 @@ type Converter struct{
 	pspTmpl *template.Template
 }
 
-func JoinProcMountTypes(procMountTypes []v1.ProcMountType) string {
+func joinProcMountTypes(procMountTypes []v1.ProcMountType) string {
 	var sb strings.Builder
 
 	for  idx, procMountType := range procMountTypes {
@@ -37,7 +37,7 @@ func JoinProcMountTypes(procMountTypes []v1.ProcMountType) string {
 	return sb.String()
 }
 
-func JoinCapabilities(capabilities []v1.Capability) string {
+func joinCapabilities(capabilities []v1.Capability) string {
 	var sb strings.Builder
 
 	for  idx, cap := range capabilities {
@@ -50,7 +50,7 @@ func JoinCapabilities(capabilities []v1.Capability) string {
 	return sb.String()
 }
 
-func JoinFSTypes(fsTypes []v1beta1.FSType) string {
+func joinFSTypes(fsTypes []v1beta1.FSType) string {
 	var sb strings.Builder
 
 	for  idx, fsType := range fsTypes {
@@ -63,7 +63,7 @@ func JoinFSTypes(fsTypes []v1beta1.FSType) string {
 	return sb.String()
 }
 
-func JoinIDRanges(ranges []v1beta1.IDRange) string {
+func joinIDRanges(ranges []v1beta1.IDRange) string {
 
 	var sb strings.Builder
 
@@ -81,7 +81,7 @@ func JoinIDRanges(ranges []v1beta1.IDRange) string {
 	return sb.String()
 }
 
-func JoinHostPortRanges(ranges []v1beta1.HostPortRange) string {
+func joinHostPortRanges(ranges []v1beta1.HostPortRange) string {
 
 	var sb strings.Builder
 
@@ -99,7 +99,7 @@ func JoinHostPortRanges(ranges []v1beta1.HostPortRange) string {
 	return sb.String()
 }
 
-func JoinHostPaths(ranges []v1beta1.AllowedHostPath) string {
+func joinHostPaths(ranges []v1beta1.AllowedHostPath) string {
 
 	var sb strings.Builder
 
@@ -113,7 +113,7 @@ func JoinHostPaths(ranges []v1beta1.AllowedHostPath) string {
 	return sb.String()
 }
 
-func JoinFlexvolumes(ranges []v1beta1.AllowedFlexVolume) string {
+func joinFlexvolumes(ranges []v1beta1.AllowedFlexVolume) string {
 
 	var sb strings.Builder
 
@@ -132,13 +132,13 @@ func NewConverter() (*Converter, error) {
 	tmpl := template.New("pspRules")
 
 	tmpl = tmpl.Funcs(template.FuncMap{
-		"JoinProcMountTypes": JoinProcMountTypes,
-		"JoinCapabilities": JoinCapabilities,
-		"JoinFSTypes": JoinFSTypes,
-		"JoinIDRanges": JoinIDRanges,
-		"JoinHostPortRanges": JoinHostPortRanges,
-		"JoinHostPaths": JoinHostPaths,
-		"JoinFlexvolumes": JoinFlexvolumes,
+		"JoinProcMountTypes": joinProcMountTypes,
+		"JoinCapabilities": joinCapabilities,
+		"JoinFSTypes": joinFSTypes,
+		"JoinIDRanges": joinIDRanges,
+		"JoinHostPortRanges": joinHostPortRanges,
+		"JoinHostPaths": joinHostPaths,
+		"JoinFlexvolumes": joinFlexvolumes,
 	})
 
 	tmpl, err := tmpl.Parse(K8sPspRulesTemplate)
