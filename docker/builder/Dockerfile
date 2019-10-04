@@ -38,6 +38,10 @@ RUN source scl_source enable devtoolset-7 && \
 # fixme: deps needs a fix into CMakeLists.txt
 RUN yum -y install libyaml-devel && yum clean all -y
 
+# Install go (required for falco-psp-conv binary)
+RUN curl -O https://dl.google.com/go/go1.12.10.linux-amd64.tar.gz
+RUN tar -C /usr/local -xzf go1.12.10.linux-amd64.tar.gz
+
 COPY ./root /
 
 # DTS
