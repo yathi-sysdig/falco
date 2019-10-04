@@ -310,14 +310,13 @@ var (
 #########################################
 
 - macro: psp_allow_privilege_escalation
-  condition: (ka.req.pod.containers.allow_privilege_escalation intersects (true) or
-              ka.req.pod.containers.privileged intersects (true))
+  condition: (ka.req.pod.containers.allow_privilege_escalation intersects (true))
 
 - rule: PSP Violation (allowPrivilegeEscalation)
   desc: >
     Detect a psp validation failure for allowPrivilegeEscalation using k8s audit logs
   condition: psp_ka_container and psp_allow_privilege_escalation
-  output: Pod Security Policy {{ .Name }} validation failure--pod with privileged=true or allowPrivilegeEscalation=true (user=%ka.user.name pod=%ka.resp.name ns=%ka.target.namespace images=%ka.req.pod.containers.image spec=%jevt.value[/requestObject/spec])
+  output: Pod Security Policy {{ .Name }} validation failure--pod with allowPrivilegeEscalation=true (user=%ka.user.name pod=%ka.resp.name ns=%ka.target.namespace images=%ka.req.pod.containers.image spec=%jevt.value[/requestObject/spec])
   priority: WARNING
   source: k8s_audit
   tags: [k8s-psp]
