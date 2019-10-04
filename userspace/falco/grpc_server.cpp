@@ -118,8 +118,8 @@ void falco::grpc::server::run()
 
 	::grpc::ServerBuilder builder;
 	builder.AddListeningPort(m_server_addr, ::grpc::SslServerCredentials(ssl_opts));
-	builder.RegisterService(&m_svc);
-	// fixme(leodido) > register various services ...
+	builder.RegisterService(&m_output_svc);
+	builder.RegisterService(&m_version_svc);
 
 	m_completion_queue = builder.AddCompletionQueue();
 	m_server = builder.BuildAndStart();
@@ -130,7 +130,7 @@ void falco::grpc::server::run()
 	// For this approach to be sufficient server::IMPL have to be fast
 	int context_num = m_threadiness * 10;
 
-	//REGISTER_UNARY(version::request, version::response, version::service, version, version, context_num)
+	REGISTER_UNARY(version::request, version::response, version::service, version, version, context_num)
 	REGISTER_STREAM(output::request, output::response, output::service, subscribe, subscribe, context_num)
 
 	m_threads.resize(m_threadiness);
