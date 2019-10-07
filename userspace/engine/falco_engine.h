@@ -50,7 +50,7 @@ limitations under the License.
 class falco_engine : public falco_common
 {
 public:
-	falco_engine(bool seed_rng=true, const std::string& alternate_lua_dir=FALCO_ENGINE_SOURCE_LUA_DIR);
+	falco_engine(bool seed_rng = true, const std::string &alternate_lua_dir = FALCO_ENGINE_SOURCE_LUA_DIR);
 	virtual ~falco_engine();
 
 	// A given engine has a version which identifies the fields
@@ -60,7 +60,7 @@ public:
 	static uint32_t engine_version();
 
 	// Print to stdout (using printf) a description of each field supported by this engine.
-	void list_fields(bool names_only=false);
+	void list_fields(bool names_only = false);
 
 	//
 	// Load rules either directly or from a filename.
@@ -150,7 +150,8 @@ public:
 
 	// **Methods Related to k8s audit log events, which are
 	// **represented as json objects.
-	struct rule_result {
+	struct rule_result
+	{
 		gen_event *evt;
 		std::string rule;
 		std::string source;
@@ -191,7 +192,7 @@ public:
 	//
 	void add_k8s_audit_filter(std::string &rule,
 				  std::set<std::string> &tags,
-				  json_event_filter* filter);
+				  json_event_filter *filter);
 
 	// **Methods Related to Sinsp Events e.g system calls
 	//
@@ -232,13 +233,12 @@ public:
 			      std::set<uint32_t> &evttypes,
 			      std::set<uint32_t> &syscalls,
 			      std::set<std::string> &tags,
-			      sinsp_filter* filter);
+			      sinsp_filter *filter);
 
 	sinsp_filter_factory &sinsp_factory();
 	json_event_filter_factory &json_factory();
 
 private:
-
 	static nlohmann::json::json_pointer k8s_audit_time;
 
 	//
@@ -288,4 +288,3 @@ private:
 	std::string m_extra;
 	bool m_replace_container_info;
 };
-

@@ -23,7 +23,8 @@ limitations under the License.
 #include <exception>
 #include <mutex>
 
-extern "C" {
+extern "C"
+{
 #include "lua.h"
 #include "lualib.h"
 #include "lauxlib.h"
@@ -52,7 +53,7 @@ struct falco_exception : std::exception
 		m_error_str = error_str;
 	}
 
-	char const* what() const throw()
+	char const *what() const throw()
 	{
 		return m_error_str.c_str();
 	}
@@ -76,7 +77,7 @@ public:
 
 	void set_inspector(sinsp *inspector);
 
-    // Priority levels, as a vector of strings
+	// Priority levels, as a vector of strings
 	static std::vector<std::string> priority_names;
 
 	// Same as numbers/indices into the above vector

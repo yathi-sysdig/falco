@@ -27,13 +27,13 @@ limitations under the License.
 #include "grpc_context.h"
 #include "utils.h"
 
-#define REGISTER_STREAM(req, res, svc, rpc, impl, num)                                  \
-	std::vector<request_stream_context<req, res>> rpc##_contexts(num);         \
-	for(request_stream_context<req, res> & ctx : rpc##_contexts)               \
-	{                                                                          \
-		ctx.m_process_func = &server::impl;                                \
-		ctx.m_request_func = &svc::AsyncService::Request##rpc; \
-		ctx.start(this);                                                   \
+#define REGISTER_STREAM(req, res, svc, rpc, impl, num)                     \
+	std::vector<request_stream_context<req, res>> rpc##_contexts(num); \
+	for(request_stream_context<req, res> & ctx : rpc##_contexts)       \
+	{                                                                  \
+		ctx.m_process_func = &server::impl;                        \
+		ctx.m_request_func = &svc::AsyncService::Request##rpc;     \
+		ctx.start(this);                                           \
 	}
 
 namespace falco

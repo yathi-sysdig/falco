@@ -22,7 +22,8 @@ limitations under the License.
 #include <memory>
 #include <map>
 
-extern "C" {
+extern "C"
+{
 #include "lua.h"
 #include "lualib.h"
 #include "lauxlib.h"
@@ -73,7 +74,7 @@ public:
 			falco_common::priority_type priority,
 			std::string &msg,
 			std::string &rule,
-			std::map<std::string,std::string> &output_fields);
+			std::map<std::string, std::string> &output_fields);
 
 	void reopen_outputs();
 
@@ -81,7 +82,6 @@ public:
 	static int handle_grpc(lua_State *ls);
 
 private:
-
 	falco_engine *m_falco_engine;
 
 	bool m_initialized;

@@ -47,7 +47,6 @@ private:
 class falco_webserver
 {
 public:
-
 	falco_webserver();
 	virtual ~falco_webserver();
 
@@ -59,7 +58,6 @@ public:
 	void stop();
 
 private:
-
 	falco_engine *m_engine;
 	falco_configuration *m_config;
 	falco_outputs *m_outputs;

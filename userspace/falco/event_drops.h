@@ -29,7 +29,6 @@ limitations under the License.
 class syscall_evt_drop_mgr
 {
 public:
-
 	// The possible actions that this class can take upon
 	// detecting a syscall event drop.
 	enum action
@@ -60,7 +59,6 @@ public:
 	void print_stats();
 
 protected:
-
 	// Perform all configured actions.
 	bool perform_actions(uint64_t now, scap_stats &delta, bool bpf_enabled);
 
@@ -74,5 +72,3 @@ protected:
 	scap_stats m_last_stats;
 	bool m_simulate_drops;
 };
-
-

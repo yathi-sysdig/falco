@@ -66,7 +66,7 @@ json_event_value::json_event_value(const std::string &val)
 	{
 		m_type = JT_INT64_PAIR;
 	}
-	else if (parse_as_int64(m_intval, val))
+	else if(parse_as_int64(m_intval, val))
 	{
 		m_type = JT_INT64;
 	}
@@ -77,7 +77,7 @@ json_event_value::json_event_value(const std::string &val)
 	}
 }
 
-json_event_value::json_event_value(int64_t val) :
+json_event_value::json_event_value(int64_t val):
 	m_type(JT_INT64),
 	m_intval(val)
 {
@@ -258,12 +258,12 @@ bool json_event_value::contains(const json_event_value &val) const
 	return (str.find(valstr) != string::npos);
 }
 
-bool json_event_value::parse_as_pair_int64(std::pair<int64_t,int64_t> &pairval, const std::string &val)
+bool json_event_value::parse_as_pair_int64(std::pair<int64_t, int64_t> &pairval, const std::string &val)
 {
 	size_t pos = val.find_first_of(':');
 	if(pos != std::string::npos &&
 	   json_event_value::parse_as_int64(pairval.first, val.substr(0, pos)) &&
-	   json_event_value::parse_as_int64(pairval.second, val.substr(pos+1)))
+	   json_event_value::parse_as_int64(pairval.second, val.substr(pos + 1)))
 	{
 		return true;
 	}
@@ -273,7 +273,8 @@ bool json_event_value::parse_as_pair_int64(std::pair<int64_t,int64_t> &pairval, 
 
 bool json_event_value::parse_as_int64(int64_t &intval, const std::string &val)
 {
-	try {
+	try
+	{
 		std::string::size_type ptr;
 
 		intval = std::stoll(val, &ptr);
@@ -283,7 +284,7 @@ bool json_event_value::parse_as_int64(int64_t &intval, const std::string &val)
 			return false;
 		}
 	}
-	catch (std::invalid_argument &e)
+	catch(std::invalid_argument &e)
 	{
 		return false;
 	}
@@ -305,7 +306,8 @@ bool json_event_filter_check::def_extract(const nlohmann::json &root,
 		return true;
 	}
 
-	try {
+	try
+	{
 		const json &j = root.at(*it);
 
 		if(j.is_array())
@@ -404,12 +406,12 @@ json_event_filter_check::alias::alias()
 {
 }
 
-json_event_filter_check::alias::alias(std::list<nlohmann::json::json_pointer> ptrs) :
+json_event_filter_check::alias::alias(std::list<nlohmann::json::json_pointer> ptrs):
 	m_jptrs(ptrs)
 {
 }
 
-json_event_filter_check::alias::alias(extract_t extract) :
+json_event_filter_check::alias::alias(extract_t extract):
 	m_extract(extract)
 {
 }
@@ -514,7 +516,7 @@ bool json_event_filter_check::compare(gen_event *evt)
 
 	uint32_t len;
 
-	const extracted_values_t *evalues = (const extracted_values_t *) extract(jevt, &len);
+	const extracted_values_t *evalues = (const extracted_values_t *)extract(jevt, &len);
 	values_set_t setvals;
 
 	switch(m_cmpop)
@@ -646,7 +648,7 @@ uint8_t *json_event_filter_check::extract(gen_event *evt, uint32_t *len, bool sa
 	m_evalues.first.clear();
 	m_evalues.second.clear();
 
-	if (!extract_values((json_event *) evt))
+	if(!extract_values((json_event *)evt))
 	{
 		m_evalues.first.clear();
 		m_evalues.second.clear();
@@ -670,15 +672,16 @@ bool json_event_filter_check::extract_values(json_event *jevt)
 		}
 		else
 		{
-			if (!def_extract(jevt->jevt(), m_jptrs, m_jptrs.begin()))
+			if(!def_extract(jevt->jevt(), m_jptrs, m_jptrs.begin()))
 			{
 				return false;
 			}
 
-			if(! m_idx.empty())
+			if(!m_idx.empty())
 			{
 				// The default only knows how to index by numeric indices
-				try {
+				try
+				{
 					std::string::size_type ptr;
 					std::string::size_type idx_num = std::stoll(m_idx, &ptr);
 
@@ -696,7 +699,7 @@ bool json_event_filter_check::extract_values(json_event *jevt)
 					new_values.push_back(m_evalues.first.at(idx_num));
 					m_evalues.first = new_values;
 				}
-				catch (std::invalid_argument &e)
+				catch(std::invalid_argument &e)
 				{
 					return false;
 				}
@@ -810,9 +813,10 @@ bool jevt_filter_check::extract_values(json_event *jevt)
 	{
 		tstr = jevt->jevt().dump();
 	}
-	else if (m_field == s_jevt_value_field)
+	else if(m_field == s_jevt_value_field)
 	{
-		try {
+		try
+		{
 			const json &j = jevt->jevt().at(m_idx_ptr);
 			tstr = json_as_string(j);
 		}
@@ -889,7 +893,8 @@ bool k8s_audit_filter_check::extract_query_param(const nlohmann::json &j,
 	string uri;
 	std::vector<std::string> uri_parts, query_parts;
 
-	try {
+	try
+	{
 		uri = j.at(request_uri_ptr);
 	}
 	catch(json::out_of_range &e)
@@ -920,7 +925,6 @@ bool k8s_audit_filter_check::extract_query_param(const nlohmann::json &j,
 	return false;
 }
 
-
 bool k8s_audit_filter_check::extract_rule_attrs(const json &j,
 						json_event_filter_check &jchk)
 {
@@ -934,11 +938,11 @@ bool k8s_audit_filter_check::extract_rule_attrs(const json &j,
 	{
 		const json &rules = j.at(rules_ptr);
 
-		for (auto &rule : rules)
+		for(auto &rule : rules)
 		{
 			if(rule.find(prop) != rule.end())
 			{
-				for (auto &item : rule.at(prop))
+				for(auto &item : rule.at(prop))
 				{
 					jchk.add_extracted_value(json_as_string(item));
 				}
@@ -958,12 +962,13 @@ bool k8s_audit_filter_check::extract_volume_types(const json &j,
 {
 	static json::json_pointer volumes_ptr = "/requestObject/spec/volumes"_json_pointer;
 
-	try {
+	try
+	{
 		const nlohmann::json &vols = j.at(volumes_ptr);
 
 		for(auto &vol : vols)
 		{
-			for (auto it = vol.begin(); it != vol.end(); ++it)
+			for(auto it = vol.begin(); it != vol.end(); ++it)
 			{
 				// Any key other than "name" represents a volume type
 				if(it.key() != "name")
@@ -986,7 +991,8 @@ bool k8s_audit_filter_check::extract_host_port(const json &j,
 {
 	static json::json_pointer containers_ptr = "/requestObject/spec/containers"_json_pointer;
 
-	try {
+	try
+	{
 		const json &containers = j.at(containers_ptr);
 
 		for(auto &container : containers)
@@ -1004,7 +1010,7 @@ bool k8s_audit_filter_check::extract_host_port(const json &j,
 				{
 					jchk.add_extracted_value(json_as_string(cport.at("hostPort")));
 				}
-				else if (cport.find("containerPort") != cport.end())
+				else if(cport.find("containerPort") != cport.end())
 				{
 					// When hostNetwork is true, this will match the host port.
 					jchk.add_extracted_value(json_as_string(cport.at("containerPort")));
@@ -1028,7 +1034,8 @@ bool k8s_audit_filter_check::extract_effective_run_as(const json &j,
 	static json::json_pointer run_as_user_ptr = "/securityContext/runAsUser"_json_pointer;
 	static json::json_pointer run_as_group_ptr = "/securityContext/runAsGroup"_json_pointer;
 
-	try {
+	try
+	{
 		const json &spec = j.at(spec_ptr);
 
 		int64_t pod_id;
@@ -1171,7 +1178,7 @@ k8s_audit_filter_check::k8s_audit_filter_check()
 			{"ka.req.pod.containers.add_capabilities", {{"/requestObject/spec/containers"_json_pointer, "/securityContext/capabilities/add"_json_pointer}}},
 			{"ka.req.service.type", {{"/requestObject/spec/type"_json_pointer}}},
 			{"ka.req.service.ports", {{"/requestObject/spec/ports"_json_pointer}}},
-                        {"ka.req.pod.volumes.hostpath", {{"/requestObject/spec/volumes"_json_pointer, "/hostPath/path"_json_pointer}}},
+			{"ka.req.pod.volumes.hostpath", {{"/requestObject/spec/volumes"_json_pointer, "/hostPath/path"_json_pointer}}},
 			{"ka.req.pod.volumes.flexvolume_driver", {{"/requestObject/spec/volumes"_json_pointer, "/flexVolume/driver"_json_pointer}}},
 			{"ka.req.pod.volumes.volume_type", {extract_volume_types}},
 			{"ka.resp.name", {{"/responseObject/metadata/name"_json_pointer}}},
@@ -1379,7 +1386,7 @@ void json_event_formatter::resolve_tokens(json_event *ev, std::list<std::pair<st
 		{
 			uint32_t len;
 
-			(void) tok.check->extract(ev, &len);
+			(void)tok.check->extract(ev, &len);
 
 			const json_event_filter_check::values_t &evals =
 				tok.check->extracted_values();
@@ -1389,7 +1396,7 @@ void json_event_formatter::resolve_tokens(json_event *ev, std::list<std::pair<st
 			{
 				res_str = evals.at(0).as_string();
 			}
-			else if (evals.size() > 1)
+			else if(evals.size() > 1)
 			{
 				res_str = "(";
 				for(auto &val : evals)

@@ -21,7 +21,8 @@ limitations under the License.
 
 #include "sinsp.h"
 
-extern "C" {
+extern "C"
+{
 #include "lua.h"
 #include "lualib.h"
 #include "lauxlib.h"
@@ -34,8 +35,8 @@ class sinsp_evt_formatter;
 
 class falco_formats
 {
- public:
-	static void init(sinsp* inspector,
+public:
+	static void init(sinsp *inspector,
 			 falco_engine *engine,
 			 lua_State *ls,
 			 bool json_output,
@@ -56,7 +57,7 @@ class falco_formats
 	// resolve_tokens = falco.resolve_tokens(evt, formatter)
 	static int resolve_tokens(lua_State *ls);
 
-	static sinsp* s_inspector;
+	static sinsp *s_inspector;
 	static falco_engine *s_engine;
 	static sinsp_evt_formatter_cache *s_formatters;
 	static bool s_json_output;

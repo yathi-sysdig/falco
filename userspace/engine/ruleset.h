@@ -40,12 +40,12 @@ public:
 	void add(std::string &name,
 		 std::set<std::string> &tags,
 		 std::set<uint32_t> &event_tags,
-		 gen_event_filter* filter);
+		 gen_event_filter *filter);
 
 	// rulesets are arbitrary numbers and should be managed by the caller.
-        // Note that rulesets are used to index into a std::vector so
-        // specifying unnecessarily large rulesets will result in
-        // unnecessarily large vectors.
+	// Note that rulesets are used to index into a std::vector so
+	// specifying unnecessarily large rulesets will result in
+	// unnecessarily large vectors.
 
 	// Find those rules matching the provided substring and set
 	// their enabled status to enabled.
@@ -60,7 +60,6 @@ public:
 	// enable_tags.
 	void enable_tags(const std::set<std::string> &tags, bool enabled, uint16_t ruleset = 0);
 
-
 	// Return the number of falco rules enabled for the provided ruleset
 	uint64_t num_rules_for_ruleset(uint16_t ruleset = 0);
 
@@ -74,8 +73,8 @@ public:
 	void event_tags_for_ruleset(std::vector<bool> &event_tags, uint16_t ruleset);
 
 private:
-
-	struct filter_wrapper {
+	struct filter_wrapper
+	{
 		gen_event_filter *filter;
 
 		// Indexes from event tag to enabled/disabled.
@@ -83,7 +82,8 @@ private:
 	};
 
 	// A group of filters all having the same ruleset
-	class ruleset_filters {
+	class ruleset_filters
+	{
 	public:
 		ruleset_filters();
 
@@ -104,7 +104,6 @@ private:
 		// Maps from event tag to a list of filters. There can
 		// be multiple filters for a given event tag.
 		std::vector<std::list<filter_wrapper *> *> m_filter_by_event_tag;
-
 	};
 
 	std::vector<ruleset_filters *> m_rulesets;
@@ -114,7 +113,7 @@ private:
 
 	// This holds all the filters passed to add(), so they can
 	// be cleaned up.
-	std::map<std::string,filter_wrapper *> m_filters;
+	std::map<std::string, filter_wrapper *> m_filters;
 };
 
 // falco_sinsp_ruleset is a specialization of falco_ruleset that
@@ -129,7 +128,7 @@ public:
 		 std::set<uint32_t> &evttypes,
 		 std::set<uint32_t> &syscalls,
 		 std::set<std::string> &tags,
-		 sinsp_filter* filter);
+		 sinsp_filter *filter);
 
 	bool run(sinsp_evt *evt, uint16_t ruleset = 0);
 

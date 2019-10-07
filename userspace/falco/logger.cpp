@@ -23,11 +23,10 @@ limitations under the License.
 
 #include "falco_common.h"
 
-const static struct luaL_reg ll_falco [] =
-{
-	{"syslog", &falco_logger::syslog},
-	{NULL,NULL}
-};
+const static struct luaL_reg ll_falco[] =
+	{
+		{"syslog", &falco_logger::syslog},
+		{NULL, NULL}};
 
 int falco_logger::level = LOG_INFO;
 bool falco_logger::time_format_iso_8601 = false;
@@ -82,11 +81,12 @@ void falco_logger::set_level(string &level)
 	}
 }
 
-
-int falco_logger::syslog(lua_State *ls) {
+int falco_logger::syslog(lua_State *ls)
+{
 	int priority = luaL_checknumber(ls, 1);
 
-	if (priority > LOG_DEBUG) {
+	if(priority > LOG_DEBUG)
+	{
 		return luaL_argerror(ls, 1, "falco.syslog: priority must be a number between 0 and 7");
 	}
 
@@ -109,7 +109,7 @@ void falco_logger::log(int priority, const string msg)
 
 	string copy = msg;
 
-	if (falco_logger::log_syslog)
+	if(falco_logger::log_syslog)
 	{
 		// Syslog output should not have any trailing newline
 		if(copy.back() == '\n')
@@ -120,7 +120,7 @@ void falco_logger::log(int priority, const string msg)
 		::syslog(priority, "%s", copy.c_str());
 	}
 
-	if (falco_logger::log_stderr)
+	if(falco_logger::log_stderr)
 	{
 		// log output should always have a trailing newline
 		if(copy.back() != '\n')
@@ -151,7 +151,7 @@ void falco_logger::log(int priority, const string msg)
 			if(atime)
 			{
 				tstr = atime;
-				tstr = tstr.substr(0, 24);// remove trailling newline
+				tstr = tstr.substr(0, 24); // remove trailling newline
 			}
 			else
 			{
@@ -161,5 +161,3 @@ void falco_logger::log(int priority, const string msg)
 		}
 	}
 }
-
-

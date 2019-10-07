@@ -22,7 +22,8 @@ limitations under the License.
 #include "sinsp.h"
 #include <syslog.h>
 
-extern "C" {
+extern "C"
+{
 #include "lua.h"
 #include "lualib.h"
 #include "lauxlib.h"
@@ -30,7 +31,7 @@ extern "C" {
 
 class falco_logger
 {
- public:
+public:
 	static void init(lua_State *ls);
 
 	static void set_time_format_iso_8601(bool val);

@@ -62,13 +62,13 @@ void falco_common::init(const char *lua_main_filename, const char *alternate_lua
 	string lua_main_path = lua_dir + lua_main_filename;
 
 	is.open(lua_main_path);
-	if (!is.is_open())
+	if(!is.is_open())
 	{
 		lua_dir = alternate_lua_dir;
 		lua_main_path = lua_dir + lua_main_filename;
 
 		is.open(lua_main_path);
-		if (!is.is_open())
+		if(!is.is_open())
 		{
 			throw falco_exception("Could not find Falco Lua entrypoint (tried " +
 					      string(FALCO_ENGINE_LUA_DIR) + lua_main_filename + ", " +
@@ -86,7 +86,7 @@ void falco_common::init(const char *lua_main_filename, const char *alternate_lua
 	if(luaL_loadstring(m_ls, scriptstr.c_str()) || lua_pcall(m_ls, 0, 0, 0))
 	{
 		throw falco_exception("Failed to load script " +
-			lua_main_path + ": " + lua_tostring(m_ls, -1));
+				      lua_main_path + ": " + lua_tostring(m_ls, -1));
 	}
 }
 
@@ -99,7 +99,7 @@ void falco_common::add_lua_path(string &path)
 	lua_getglobal(m_ls, "package");
 
 	lua_getfield(m_ls, -1, "path");
-	string cur_path = lua_tostring(m_ls, -1 );
+	string cur_path = lua_tostring(m_ls, -1);
 	cur_path += ';';
 	lua_pop(m_ls, 1);
 
@@ -109,7 +109,7 @@ void falco_common::add_lua_path(string &path)
 	lua_setfield(m_ls, -2, "path");
 
 	lua_getfield(m_ls, -1, "cpath");
-	string cur_cpath = lua_tostring(m_ls, -1 );
+	string cur_cpath = lua_tostring(m_ls, -1);
 	cur_cpath += ';';
 	lua_pop(m_ls, 1);
 
@@ -120,4 +120,3 @@ void falco_common::add_lua_path(string &path)
 
 	lua_pop(m_ls, 1);
 }
-

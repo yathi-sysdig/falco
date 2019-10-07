@@ -19,13 +19,13 @@ limitations under the License.
 
 #include "event_drops.h"
 
-syscall_evt_drop_mgr::syscall_evt_drop_mgr()
-	: m_num_syscall_evt_drops(0),
-	  m_num_actions(0),
-	  m_inspector(NULL),
-	  m_outputs(NULL),
-	  m_next_check_ts(0),
-	  m_simulate_drops(false)
+syscall_evt_drop_mgr::syscall_evt_drop_mgr():
+	m_num_syscall_evt_drops(0),
+	m_num_actions(0),
+	m_inspector(NULL),
+	m_outputs(NULL),
+	m_next_check_ts(0),
+	m_simulate_drops(false)
 {
 }
 
@@ -116,7 +116,7 @@ bool syscall_evt_drop_mgr::perform_actions(uint64_t now, scap_stats &delta, bool
 	std::string rule = "Falco internal: syscall event drop";
 	std::string msg = rule + ". " + std::to_string(delta.n_drops) + " system calls dropped in last second.";
 
-	std::map<std::string,std::string> output_fields;
+	std::map<std::string, std::string> output_fields;
 
 	output_fields["n_evts"] = std::to_string(delta.n_evts);
 	output_fields["n_drops"] = std::to_string(delta.n_drops);

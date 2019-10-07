@@ -69,7 +69,8 @@ protected:
 class json_event_value
 {
 public:
-	enum param_type {
+	enum param_type
+	{
 		JT_STRING,
 		JT_INT64,
 		JT_INT64_PAIR
@@ -96,7 +97,7 @@ public:
 private:
 	param_type m_type;
 
-	static bool parse_as_pair_int64(std::pair<int64_t,int64_t> &pairval, const std::string &val);
+	static bool parse_as_pair_int64(std::pair<int64_t, int64_t> &pairval, const std::string &val);
 	static bool parse_as_int64(int64_t &intval, const std::string &val);
 
 	// The number of possible types is small so far, so sticking
@@ -104,16 +105,16 @@ private:
 
 	std::string m_stringval;
 	int64_t m_intval;
-	std::pair<int64_t,int64_t> m_pairval;
+	std::pair<int64_t, int64_t> m_pairval;
 };
 
 class json_event_filter_check : public gen_event_filter_check
 {
 public:
-
 	static std::string no_value;
 
-	enum index_mode {
+	enum index_mode
+	{
 		IDX_REQUIRED = 0,
 		IDX_ALLOWED,
 		IDX_NONE
@@ -121,7 +122,8 @@ public:
 
 	static std::vector<std::string> s_index_mode_strs;
 
-	enum index_type {
+	enum index_type
+	{
 		IDX_KEY = 0,
 		IDX_NUMERIC
 	};
@@ -129,7 +131,8 @@ public:
 	static std::vector<std::string> s_index_type_strs;
 
 	// A struct describing a single filtercheck field ("ka.user")
-	struct field_info {
+	struct field_info
+	{
 		std::string m_name;
 		std::string m_desc;
 
@@ -150,7 +153,8 @@ public:
 	};
 
 	// A struct describing a group of filtercheck fields ("ka")
-	struct check_info {
+	struct check_info
+	{
 		std::string m_name;
 		std::string m_desc;
 		std::string m_class_info;
@@ -161,12 +165,12 @@ public:
 	json_event_filter_check();
 	virtual ~json_event_filter_check();
 
-	virtual int32_t parse_field_name(const char* str, bool alloc_state, bool needed_for_filtering);
-	void add_filter_value(const char* str, uint32_t len, uint32_t i = 0 );
+	virtual int32_t parse_field_name(const char *str, bool alloc_state, bool needed_for_filtering);
+	void add_filter_value(const char *str, uint32_t len, uint32_t i = 0);
 	bool compare(gen_event *evt);
 
 	// This always returns a const extracted_values_t *. The pointer points to m_evalues;
-	uint8_t* extract(gen_event *evt, uint32_t* len, bool sanitize_strings = true) final;
+	uint8_t *extract(gen_event *evt, uint32_t *len, bool sanitize_strings = true) final;
 
 	const std::string &field();
 	const std::string &idx();
@@ -192,7 +196,6 @@ public:
 	const values_t &extracted_values();
 
 protected:
-
 	// Subclasses can override this method, calling
 	// add_extracted_value to add extracted values.
 	virtual bool extract_values(json_event *jevt);
@@ -208,15 +211,16 @@ protected:
 	// values instead of using a json pointer. An example is
 	// ka.uri.param, which parses the query string to extract
 	// key=value parameters.
-	typedef std::function<bool (const nlohmann::json &, json_event_filter_check &jchk)> extract_t;
+	typedef std::function<bool(const nlohmann::json &, json_event_filter_check &jchk)> extract_t;
 
-	struct alias {
+	struct alias
+	{
 		// The variants allow for brace-initialization either
 		// with just the pointer list or with a custom
 		// extraction function.
 		alias();
-	        alias(std::list<nlohmann::json::json_pointer> ptrs);
-	        alias(extract_t extract);
+		alias(std::list<nlohmann::json::json_pointer> ptrs);
+		alias(extract_t extract);
 
 		virtual ~alias();
 
@@ -290,16 +294,14 @@ public:
 	jevt_filter_check();
 	virtual ~jevt_filter_check();
 
-        int32_t parse_field_name(const char* str, bool alloc_state, bool needed_for_filtering) final;
+	int32_t parse_field_name(const char *str, bool alloc_state, bool needed_for_filtering) final;
 
 	json_event_filter_check *allocate_new();
 
 protected:
-
 	bool extract_values(json_event *jevt) final;
 
 private:
-
 	// When the field is jevt_value, a json pointer representing
 	// the index in m_idx
 	nlohmann::json::json_pointer m_idx_ptr;
@@ -356,7 +358,6 @@ public:
 	std::set<std::string> m_tags;
 };
 
-
 class json_event_filter_factory : public gen_event_filter_factory
 {
 public:
@@ -375,7 +376,6 @@ public:
 private:
 	std::list<std::shared_ptr<json_event_filter_check>> m_defined_checks;
 	std::list<json_event_filter_check::check_info> m_info;
-
 };
 
 // Unlike the other classes, this does not inherit from a shared class
@@ -393,11 +393,10 @@ public:
 	std::string tojson(json_event *ev);
 	std::map<std::string, std::string> tomap(json_event *ev);
 
-	void resolve_tokens(json_event *ev, std::list<std::pair<std::string,std::string>> &resolved);
+	void resolve_tokens(json_event *ev, std::list<std::pair<std::string, std::string>> &resolved);
 
 private:
 	void parse_format();
-
 
 	// A format token is either a combination of a filtercheck
 	// name (ka.value) and filtercheck object as key, or an empty
@@ -424,6 +423,3 @@ private:
 	// All the filterchecks required to resolve tokens in the format string
 	json_event_filter_factory &m_json_factory;
 };
-
-
-

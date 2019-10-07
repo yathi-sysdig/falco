@@ -21,5 +21,4 @@ limitations under the License.
 
 #include "lua.h"
 
-int luaopen_lpeg (lua_State *L);
-
+int luaopen_lpeg(lua_State *L);

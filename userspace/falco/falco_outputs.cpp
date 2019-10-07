@@ -30,21 +30,19 @@ limitations under the License.
 using namespace std;
 using namespace falco::output;
 
-const static struct luaL_reg ll_falco_outputs [] =
-{
-	{"handle_http", &falco_outputs::handle_http},
-	{"handle_grpc", &falco_outputs::handle_grpc},
-	{NULL,NULL}
-};
+const static struct luaL_reg ll_falco_outputs[] =
+	{
+		{"handle_http", &falco_outputs::handle_http},
+		{"handle_grpc", &falco_outputs::handle_grpc},
+		{NULL, NULL}};
 
-falco_outputs::falco_outputs(falco_engine *engine)
-	: m_falco_engine(engine),
-	  m_initialized(false),
-	  m_buffered(true),
-	  m_json_output(false),
-	  m_time_format_iso_8601(false)
+falco_outputs::falco_outputs(falco_engine *engine):
+	m_falco_engine(engine),
+	m_initialized(false),
+	m_buffered(true),
+	m_json_output(false),
+	m_time_format_iso_8601(false)
 {
-
 }
 
 falco_outputs::~falco_outputs()
@@ -65,7 +63,7 @@ falco_outputs::~falco_outputs()
 
 		if(lua_pcall(m_ls, 0, 0, 0) != 0)
 		{
-			const char* lerr = lua_tostring(m_ls, -1);
+			const char *lerr = lua_tostring(m_ls, -1);
 			falco_logger::log(LOG_ERR, std::string("lua_pcall failed, err: ") + lerr);
 			assert(nullptr == "lua_pcall failed in ~falco_outputs");
 		}
@@ -78,7 +76,7 @@ void falco_outputs::init(bool json_output,
 			 bool time_format_iso_8601)
 {
 	// The engine must have been given an inspector by now.
-	if(! m_inspector)
+	if(!m_inspector)
 	{
 		throw falco_exception("No inspector provided");
 	}
@@ -118,12 +116,12 @@ void falco_outputs::add_output(output_config oc)
 	lua_pushnumber(m_ls, (m_time_format_iso_8601 ? 1 : 0));
 
 	// If we have options, build up a lua table containing them
-	if (oc.options.size())
+	if(oc.options.size())
 	{
 		nargs = 4;
 		lua_createtable(m_ls, 0, oc.options.size());
 
-		for (auto it = oc.options.cbegin(); it != oc.options.cend(); ++it)
+		for(auto it = oc.options.cbegin(); it != oc.options.cend(); ++it)
 		{
 			lua_pushstring(m_ls, (*it).second.c_str());
 			lua_setfield(m_ls, -2, (*it).first.c_str());
@@ -132,10 +130,9 @@ void falco_outputs::add_output(output_config oc)
 
 	if(lua_pcall(m_ls, nargs, 0, 0) != 0)
 	{
-		const char* lerr = lua_tostring(m_ls, -1);
+		const char *lerr = lua_tostring(m_ls, -1);
 		throw falco_exception(string(lerr));
 	}
-
 }
 
 void falco_outputs::handle_event(gen_event *ev, string &rule, string &source,
@@ -160,7 +157,7 @@ void falco_outputs::handle_event(gen_event *ev, string &rule, string &source,
 
 		if(lua_pcall(m_ls, 6, 0, 0) != 0)
 		{
-			const char* lerr = lua_tostring(m_ls, -1);
+			const char *lerr = lua_tostring(m_ls, -1);
 			string err = "Error invoking function output: " + string(lerr);
 			throw falco_exception(err);
 		}
@@ -175,7 +172,7 @@ void falco_outputs::handle_msg(uint64_t now,
 			       falco_common::priority_type priority,
 			       std::string &msg,
 			       std::string &rule,
-			       std::map<std::string,std::string> &output_fields)
+			       std::map<std::string, std::string> &output_fields)
 {
 	std::string full_msg;
 
@@ -184,9 +181,9 @@ void falco_outputs::handle_msg(uint64_t now,
 		nlohmann::json jmsg;
 
 		// Convert the time-as-nanoseconds to a more json-friendly ISO8601.
-		time_t evttime = now/1000000000;
+		time_t evttime = now / 1000000000;
 		char time_sec[20]; // sizeof "YYYY-MM-DDTHH:MM:SS"
-		char time_ns[12]; // sizeof ".sssssssssZ"
+		char time_ns[12];  // sizeof ".sssssssssZ"
 		string iso8601evttime;
 
 		strftime(time_sec, sizeof(time_sec), "%FT%T", gmtime(&evttime));
@@ -234,7 +231,7 @@ void falco_outputs::handle_msg(uint64_t now,
 
 		if(lua_pcall(m_ls, 3, 0, 0) != 0)
 		{
-			const char* lerr = lua_tostring(m_ls, -1);
+			const char *lerr = lua_tostring(m_ls, -1);
 			string err = "Error invoking function output: " + string(lerr);
 			throw falco_exception(err);
 		}
@@ -243,7 +240,6 @@ void falco_outputs::handle_msg(uint64_t now,
 	{
 		throw falco_exception("No function " + m_lua_output_msg + " found in lua compiler module");
 	}
-
 }
 
 void falco_outputs::reopen_outputs()
@@ -256,7 +252,7 @@ void falco_outputs::reopen_outputs()
 
 	if(lua_pcall(m_ls, 0, 0, 0) != 0)
 	{
-		const char* lerr = lua_tostring(m_ls, -1);
+		const char *lerr = lua_tostring(m_ls, -1);
 		throw falco_exception(string(lerr));
 	}
 }
@@ -275,8 +271,8 @@ int falco_outputs::handle_http(lua_State *ls)
 		lua_error(ls);
 	}
 
-	string url = (char *) lua_tostring(ls, 1);
-	string msg = (char *) lua_tostring(ls, 2);
+	string url = (char *)lua_tostring(ls, 1);
+	string msg = (char *)lua_tostring(ls, 2);
 
 	curl = curl_easy_init();
 	if(curl)
@@ -289,8 +285,9 @@ int falco_outputs::handle_http(lua_State *ls)
 
 		res = curl_easy_perform(curl);
 
-		if(res != CURLE_OK) {
-			falco_logger::log(LOG_ERR,"libcurl error: " + string(curl_easy_strerror(res)));
+		if(res != CURLE_OK)
+		{
+			falco_logger::log(LOG_ERR, "libcurl error: " + string(curl_easy_strerror(res)));
 		}
 		curl_easy_cleanup(curl);
 		curl = NULL;
@@ -318,8 +315,8 @@ int falco_outputs::handle_grpc(lua_State *ls)
 	response grpc_res = response();
 
 	// time
-	gen_event* evt = (gen_event*)lua_topointer(ls, 1);
-	auto& timestamp = *grpc_res.mutable_time();
+	gen_event *evt = (gen_event *)lua_topointer(ls, 1);
+	auto &timestamp = *grpc_res.mutable_time();
 	timestamp = google::protobuf::util::TimeUtil::NanosecondsToTimestamp(evt->get_ts());
 
 	// rule
@@ -349,10 +346,11 @@ int falco_outputs::handle_grpc(lua_State *ls)
 	grpc_res.set_output((char *)lua_tostring(ls, 5));
 
 	// output fields
-	auto& fields = *grpc_res.mutable_output_fields();
+	auto &fields = *grpc_res.mutable_output_fields();
 
 	lua_pushnil(ls); // so that lua_next removes it from stack and puts (k, v) on it
-	while (lua_next(ls, 6) != 0) {
+	while(lua_next(ls, 6) != 0)
+	{
 		fields[lua_tostring(ls, -2)] = lua_tostring(ls, -1);
 		lua_pop(ls, 1); // remove value, keep key for lua_next
 	}

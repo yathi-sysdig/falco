@@ -28,7 +28,8 @@ limitations under the License.
 // Periodically collects scap stats files and writes them to a file as
 // json.
 
-class StatsFileWriter {
+class StatsFileWriter
+{
 public:
 	StatsFileWriter();
 	virtual ~StatsFileWriter();

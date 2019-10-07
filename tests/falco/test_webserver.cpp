@@ -24,7 +24,7 @@ TEST_CASE("webserver must accept invalid data", "[!hide][webserver][k8s_audit_ha
 	// falco_engine* engine = new falco_engine();
 	// falco_outputs* outputs = new falco_outputs(engine);
 	// std::string errstr;
-    // std::string input("{\"kind\": 0}");
+	// std::string input("{\"kind\": 0}");
 	//k8s_audit_handler::accept_data(engine, outputs, input, errstr);
 
 	REQUIRE(1 == 1);

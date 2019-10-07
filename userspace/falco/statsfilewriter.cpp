@@ -25,15 +25,15 @@ limitations under the License.
 using namespace std;
 
 static bool g_save_stats = false;
-static void timer_handler (int signum)
+static void timer_handler(int signum)
 {
 	g_save_stats = true;
 }
 
 extern char **environ;
 
-StatsFileWriter::StatsFileWriter()
-	: m_num_stats(0), m_inspector(NULL)
+StatsFileWriter::StatsFileWriter():
+	m_num_stats(0), m_inspector(NULL)
 {
 }
 
@@ -49,12 +49,12 @@ bool StatsFileWriter::init(sinsp *inspector, string &filename, uint32_t interval
 
 	m_inspector = inspector;
 
-	m_output.exceptions ( ofstream::failbit | ofstream::badbit );
+	m_output.exceptions(ofstream::failbit | ofstream::badbit);
 	m_output.open(filename, ios_base::app);
 
-	memset (&handler, 0, sizeof (handler));
+	memset(&handler, 0, sizeof(handler));
 	handler.sa_handler = &timer_handler;
-	if (sigaction(SIGALRM, &handler, NULL) == -1)
+	if(sigaction(SIGALRM, &handler, NULL) == -1)
 	{
 		errstr = string("Could not set up signal handler for periodic timer: ") + strerror(errno);
 		return false;
@@ -63,7 +63,7 @@ bool StatsFileWriter::init(sinsp *inspector, string &filename, uint32_t interval
 	timer.it_value.tv_sec = 0;
 	timer.it_value.tv_usec = interval_msec * 1000;
 	timer.it_interval = timer.it_value;
-	if (setitimer(ITIMER_REAL, &timer, NULL) == -1)
+	if(setitimer(ITIMER_REAL, &timer, NULL) == -1)
 	{
 		errstr = string("Could not set up periodic timer: ") + strerror(errno);
 		return false;
@@ -72,7 +72,7 @@ bool StatsFileWriter::init(sinsp *inspector, string &filename, uint32_t interval
 	// (Undocumented) feature. Take any environment keys prefixed
 	// with FALCO_STATS_EXTRA_XXX and add them to the output. Used by
 	// run_performance_tests.sh.
-	for(uint32_t i=0; environ[i]; i++)
+	for(uint32_t i = 0; environ[i]; i++)
 	{
 		char *p = strstr(environ[i], "=");
 		if(!p)
@@ -80,12 +80,12 @@ bool StatsFileWriter::init(sinsp *inspector, string &filename, uint32_t interval
 			errstr = string("Could not find environment separator in ") + string(environ[i]);
 			return false;
 		}
-		string key(environ[i], p-environ[i]);
-		string val(p+1, strlen(environ[i])-(p-environ[i])-1);
+		string key(environ[i], p - environ[i]);
+		string val(p + 1, strlen(environ[i]) - (p - environ[i]) - 1);
 		if(key.compare(0, 18, "FALCO_STATS_EXTRA_") == 0)
 		{
 			string sub = key.substr(18);
-			if (m_extra != "")
+			if(m_extra != "")
 			{
 				m_extra += ", ";
 			}
@@ -98,7 +98,7 @@ bool StatsFileWriter::init(sinsp *inspector, string &filename, uint32_t interval
 
 void StatsFileWriter::handle()
 {
-	if (g_save_stats)
+	if(g_save_stats)
 	{
 		scap_stats cstats;
 		scap_stats delta;
@@ -123,16 +123,9 @@ void StatsFileWriter::handle()
 		{
 			m_output << ", " << m_extra;
 		}
-		m_output << ", \"cur\": {" <<
-			"\"events\": " << cstats.n_evts <<
-			", \"drops\": " << cstats.n_drops <<
-			", \"preemptions\": " << cstats.n_preemptions <<
-			"}, \"delta\": {" <<
-			"\"events\": " << delta.n_evts <<
-			", \"drops\": " << delta.n_drops <<
-			", \"preemptions\": " << delta.n_preemptions <<
-			"}, \"drop_pct\": " << (delta.n_evts == 0 ? 0 : (100.0*delta.n_drops/delta.n_evts)) <<
-			"}," << endl;
+		m_output << ", \"cur\": {"
+			 << "\"events\": " << cstats.n_evts << ", \"drops\": " << cstats.n_drops << ", \"preemptions\": " << cstats.n_preemptions << "}, \"delta\": {"
+			 << "\"events\": " << delta.n_evts << ", \"drops\": " << delta.n_drops << ", \"preemptions\": " << delta.n_preemptions << "}, \"drop_pct\": " << (delta.n_evts == 0 ? 0 : (100.0 * delta.n_drops / delta.n_evts)) << "}," << endl;
 
 		m_last_stats = cstats;
 	}
